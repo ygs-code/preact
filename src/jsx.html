@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>htm Demo</title>
+  <script type="module">
+
+    import { html, Component, render } from './standalone.module.js';
+
+    class App extends Component {
+     constructor(props) {
+          super(props);
+          console.log('props',props)
+      }
+      componentWillMount(){
+        console.log('componentWillMount')
+      }
+      componentDidMount(){
+        console.log('componentDidMount')
+
+      }
+      componentWillReceiveProps(){
+        console.log('componentWillReceiveProps')
+      }
+      shouldComponentUpdate(){
+        console.log('shouldComponentUpdate')
+      }
+      componentWillUpdate(){
+        console.log('componentWillUpdate')
+      }
+      addTodo() {
+        const { todos = [] } = this.state;
+        this.setState({ todos: todos.concat(`Item ${todos.length}`) });
+      }
+      render() {
+        const {todos = [],} = this.state;
+         const {page} = this.props;
+         console.log('todos',this.state)
+         console.log('page',page)
+         let style={color:'red'}
+         let flag=true
+
+        return html`
+          <div class="app">
+              <${flag&&Header}  name="ToDos" />
+              <${Header}  name="ToDos" />
+            <ul>
+              ${todos.map(todo => html`
+                <li class='1' style=${style}>${todo}</li>
+              `)}
+            </ul>
+            <button onClick=${() => this.addTodo()}>Add Todo</button>
+            <${Footer}>footer content here<//>
+          </div>
+        `;
+      }
+    }
+
+    const Header = ({ name }) => html`<h1 style="color:red;">${name} List</h1>`
+
+    const Footer = props => html`<footer  ...${props} />`
+
+     console.log('App',App)
+    console.log(`jsx`, html`<div class="app"><h1>ToDo's (All) List</h1><ul></ul><button>Add Todo</button><footer>footer content here</footer></div>`)
+    console.log('Header',html`<h1 style="color:red;">${name} List</h1>`)
+    render(html`<${App} page="All" />`, document.body);
+
+    console.log(render(html`<${App} page="All" />`))
+  </script>
+</html>

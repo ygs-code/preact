@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>htm Demo</title>
+  <style>
+     #text{
+       width: 500px;
+       height: 300px;;
+     }
+  </style>
+  <body>
+    <textarea id='text' >
+
+
+    </textarea>
+    <button id='but'>
+     执行
+
+    </button>
+    <div id='parser'>
+
+    </div>
+  </body>
+  <script type="module">
+    var text = document.getElementById('text')
+    var parser = document.getElementById('parser')
+    var but = document.getElementById('but')
+    import { html, Component, render } from './standalone.module.js';
+    window.html=html;
+    window.Component=Component;
+    window.render=render;
+
+    // class App extends Component {
+    //  constructor(props) {
+    //       super(props);
+    //       console.log('props',props)
+    //   }
+    //   componentWillMount(){
+    //     console.log('componentWillMount')
+    //   }
+    //   componentDidMount(){
+    //     console.log('componentDidMount')
+
+    //   }
+    //   componentWillReceiveProps(){
+    //     console.log('componentWillReceiveProps')
+    //   }
+    //   shouldComponentUpdate(){
+    //     console.log('shouldComponentUpdate')
+    //   }
+    //   componentWillUpdate(){
+    //     console.log('componentWillUpdate')
+    //   }
+    //   addTodo() {
+    //     // const { todos = [] } = this.state;
+    //     // this.setState({ todos: todos.concat(`Item ${todos.length}`) });
+    //   }
+    //   render() {
+    //     return html`<div class="app">123456</div>`;
+    //   }
+    // }
+
+    //  const Header = ({ name }) => html`<h1>${name} List</h1>`
+    //  console.log(Header)
+       //把字符串 转成真正的js 并且以一个函数形式导出去
+
+
+     var Tool={
+      noop:()=>{},
+        //把字符串 转成真正的js 并且以一个函数形式导出去
+      createFunction:(code, errors=[])=>{
+        try {
+            return new Function( code ).bind(this)
+        } catch (err) {
+          console.log('err',err)
+            errors.push({ err: err, code: code });
+            return noop
+        }
+       },
+       getExportDefaulComponentName:(code='')=>{
+        if(!code.trim()){
+           console.log('\x1B[31m%s\x1B[0m', 'Please enter the react code')
+           return null;
+        }
+        const exportDefaultComponentNameReg=/export\s+default\s+[a-zA-Z]+/g;
+        const exportDefault=/export\s+default\s+/g;
+        let exportDefaultComponentName=code.match(exportDefaultComponentNameReg);
+        if(exportDefaultComponentName&&exportDefaultComponentName.length===1){
+          exportDefaultComponentName=exportDefaultComponentName[0].replace(exportDefault,'')
+          console.log('exportDefaultComponentName',exportDefaultComponentName)
+          return {
+            exportDefaultComponentName,
+            code:code.replace(exportDefaultComponentNameReg,'')
+          }
+        }else if(exportDefaultComponentName&&exportDefaultComponentName.length>=1){
+          console.log('\x1B[31m%s\x1B[0m', 'This is export  default  Only one export is allowed')
+          // throw ('This is export  default  Only one export is allowed');
+          return {}
+        }else{
+          console.log('\x1B[31m%s\x1B[0m', 'It is an error not to export default Components')
+          // throw ('It is an error not to export default Components');
+          return  {}
+        }
+       },
+       reactComponentParser:(code,domName)=>{
+        //  try {
+           let {code:newCode='',exportDefaultComponentName=''} = Tool.getExportDefaulComponentName(code);
+           console.log('newCode',newCode)
+           console.log('exportDefaultComponentName',exportDefaultComponentName)
+           if(!newCode||!exportDefaultComponentName){
+             return
+           }
+            newCode =newCode+';  render(html`<${'+exportDefaultComponentName+'} page="All" />`,'+domName+')'
+            console.log('newCode',newCode)
+            Tool.createFunction(newCode).call(this)
+        //  }catch (err) {
+        //   console.log('\x1B[31m%s\x1B[0m', err)
+        // }
+       }
+     }
+
+
+     but.onclick=function(){
+
+       var str =`
+
+        class App extends Component {
+     constructor(props) {
+          super(props);
+          console.log('props',props)
+      }
+      componentWillMount(){
+        console.log('componentWillMount')
+      }
+      componentDidMount(){
+        console.log('componentDidMount')
+
+      }
+      componentWillReceiveProps(){
+        console.log('componentWillReceiveProps')
+      }
+      shouldComponentUpdate(){
+        console.log('shouldComponentUpdate')
+      }
+      componentWillUpdate(){
+        console.log('componentWillUpdate')
+      }
+      addTodo() {
+        const { todos = [] } = this.state;
+
+      }
+      render() {
+        const {todos = [],} = this.state;
+         const {page} = this.props;
+         console.log('todos',this.state)
+         console.log('page',page)
+        return html
+       export default App;`
+
+      //  console.log('str',str)
+      //  var exportDefaultReg=/export\s+default\s+[a-zA-Z]+/g;
+      //  console.log('exportDefaultReg',str.match(exportDefaultReg))
+
+      //  console.log();
+     console.log('text.value',text.value)
+       Tool.reactComponentParser(text.value,'parser')
+        const code ='console.log(this);'+text.value+';   render(html`<${App} page="All" />`,parser)'
+        //  console.log('code',code)
+        //  console.log('createFunction',createFunction(code,[]))
+        //  console.log('createFunction',createFunction(code,[])())
+        //  eval(text.value)
+        //  console.log('Header',Header)
+
+     }
+    // const Footer = props => html`<footer ...${props} />`
+
+
+
+  </script>
+</html>
